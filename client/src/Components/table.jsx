@@ -15,6 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import {API} from "../services/API"
+import { MonthContext } from './context';
 
 
 
@@ -30,11 +31,31 @@ export default function StickyHeadTable() {
     const [length,setLength]=React.useState(0);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [month, setMonth] = React.useState('');
+  const {month,setMonth}=React.useContext(MonthContext)
+  const [selectedTeam, setSelectedTeam] = React.useState({title:""});
 
+  React.useEffect(()=>{
+    fetch(`${API}/products/month/?page=${page+1}&month=${month}`)
+    .then((res)=>{
+       return res.json();
+    })
+    .then((json)=>{
+       // console.log(json);
+       setData(json);
+       setLength(json.length)
+    })
+  },[])
   const handleChange = (event) => {
     setMonth(event.target.value);
-     fetch(`${API}/products/?${month}`)
+     fetch(`${API}/products/month/?page=${page+1}&month=${event.target.value}`)
+     .then((res)=>{
+        return res.json();
+     })
+     .then((json)=>{
+        // console.log(json);
+        setData(json);
+        setLength(json.length)
+     })
   };
 
   const handleChangePage = (event, newPage) => {
@@ -50,29 +71,85 @@ export default function StickyHeadTable() {
 
 
   React.useEffect(()=>{
+    if(month=="")
+    {
     fetch(`${API}/products/?page=${page+1}&limit=10`)
     .then((res)=>{
         return res.json();
     }).then((json)=>{
         // console.log(json);
         setData(json);
+       
     })
+  }
 
-
-  },[page])
+  })
 
   React.useEffect(()=>{
-
-    fetch(`${API}/products`)
+    if(month=="")
+    {
+    fetch(`${API}/products/`)
     .then((res)=>{
         return res.json();
     }).then((json)=>{
+        // console.log(json);
+        setLength(json.length);
        
-        setLength(json);
+    })
+  }
+
+  })
+
+ React.useEffect(()=>{
+    if(selectedTeam.title !=null) {
+
+    
+  console.log(selectedTeam.title);
+
+    fetch(`${API}/products/search/?title=${selectedTeam.title}`)
+    .then((res)=>{
+        res.json().then((json)=>{
+             console.log(json)
+              
+              if(selectedTeam.title)
+              {
+               setData(json);
+               setLength(json.length)
+              }
+            
+        })
+    })
+    .catch((err)=>{
+      setSelectedTeam({Author:{Name:""}})
     })
 
+    }
+    else
+    {
+      fetch(`${API}/products/?page=${page+1}&limit=10`)
+      .then((res)=>{
+          return res.json();
+      }).then((json)=>{
+          // console.log(json);
+          setData(json);
+         
+      })
 
-  },[])
+      fetch(`${API}/products/`)
+      .then((res)=>{
+          return res.json();
+      }).then((json)=>{
+          // console.log(json);
+          setLength(json.length);
+         
+      })
+
+    }
+
+},[selectedTeam])
+
+
+ 
 
   return <>
     <div>
@@ -82,12 +159,12 @@ export default function StickyHeadTable() {
          <Stack spacing={2} sx={{ width: 300,display:'flex' ,justifyContent:'space-between'}}>
     <div style={{width:'100%',display:'flex',justifyContent:'space-between'}}>
         <div>
-      <Autocomplete
+      {/* <Autocomplete
         freeSolo
         id="free-solo-2-demo"
         sx={{width:200}}
         disableClearable
-        options={top100Films.map((option) => option.title)}
+        options={data.map((option) => option.title)}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -98,10 +175,11 @@ export default function StickyHeadTable() {
             }}
           />
         )}
-      />
+      /> */}
+        <Autocomplete   id="free-solo-2-demo" sx={{width:100}}  disableClearable options={data} renderInput={params => ( <TextField {...params} label="Serach Transactions" variant="outlined" /> )} getOptionLabel={option => option.title} style={{ width: 270 }} value={selectedTeam}  onChange={(_event, newTeam) => { setSelectedTeam(newTeam); }}  />
       </div>
       <div>
-        <FormControl sx={{width:200,marginLeft:80}} >
+        <FormControl sx={{width:200,marginLeft:70}} >
         <InputLabel id="demo-simple-select-autowidth-label">Month</InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
@@ -114,18 +192,18 @@ export default function StickyHeadTable() {
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          <MenuItem value={10}>January</MenuItem>
-          <MenuItem value={21}>February</MenuItem>
-          <MenuItem value={22}>March</MenuItem>
-          <MenuItem value={23}>April</MenuItem>
-          <MenuItem value={24}>May</MenuItem>
-          <MenuItem value={25}>June</MenuItem>
-          <MenuItem value={26}>July</MenuItem>
-          <MenuItem value={27}>August</MenuItem>
-          <MenuItem value={28}>September</MenuItem>
-          <MenuItem value={29}>October</MenuItem>
-          <MenuItem value={30}>November</MenuItem>
-          <MenuItem value={31}>December</MenuItem>
+          <MenuItem value="January">January</MenuItem>
+          <MenuItem value="February">February</MenuItem>
+          <MenuItem value="March">March</MenuItem>
+          <MenuItem value="April">April</MenuItem>
+          <MenuItem value="May">May</MenuItem>
+          <MenuItem value="June">June</MenuItem>
+          <MenuItem value="July">July</MenuItem>
+          <MenuItem value="August">August</MenuItem>
+          <MenuItem value="September">September</MenuItem>
+          <MenuItem value="October">October</MenuItem>
+          <MenuItem value="November">November</MenuItem>
+          <MenuItem value="December">December</MenuItem>
         </Select>
       </FormControl>
       </div>
@@ -169,7 +247,7 @@ export default function StickyHeadTable() {
       <TablePagination
         rowsPerPageOptions={[10]}
         component="div"
-        count={length.length}
+        count={length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
