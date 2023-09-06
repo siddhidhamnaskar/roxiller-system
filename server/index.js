@@ -13,6 +13,9 @@ const app=express();
 app.use(cors());
 app.use(express.json());
 app.use("/products",productRouter)
+app.get("/", (req, res) => {
+    res.send("School Management System API");
+});
 
 app.listen(PORT,()=>{
     try{
