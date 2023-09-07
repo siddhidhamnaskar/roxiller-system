@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:false}))
 app.use("/products",productRouter)
 app.get("/", (req, res) => {
-    res.send("School Management System API");
+    res.send("Management System API");
 });
 
 app.listen(PORT,()=>{

@@ -176,10 +176,11 @@ productRouter.get('/range',async(req,res)=>{
 })
 
 
-productRouter.get("/products/search",async(req,res)=>{
+productRouter.get("/search",async(req,res)=>{
   try{
 
     const {title}=req.query;
+    console.log(title);
     const blogData=await Products.find({title:title})
     //  console.log(blogData);
   
