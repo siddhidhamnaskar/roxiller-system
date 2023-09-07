@@ -16,6 +16,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import {API} from "../services/API"
 import { MonthContext } from './context';
+import { LinearProgress } from '@mui/material';
 
 
 
@@ -28,6 +29,7 @@ function createData(name, code, population, size) {
 
 export default function StickyHeadTable() {
     const [data,setData]=React.useState([]);
+    const [serachData,setSearchData]=React.useState([]);
     const [length,setLength]=React.useState(0);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -35,6 +37,15 @@ export default function StickyHeadTable() {
   const [selectedTeam, setSelectedTeam] = React.useState({title:""});
 
   React.useEffect(()=>{
+    fetch(`${API}/products/`)
+    .then((res)=>{
+        return res.json();
+    }).then((json)=>{
+        // console.log(json);
+        setSearchData(json)
+        // setLength(json.length);
+       
+    })
     fetch(`${API}/products/month/?page=${page+1}&month=${month}`)
     .then((res)=>{
        return res.json();
@@ -93,6 +104,7 @@ export default function StickyHeadTable() {
         return res.json();
     }).then((json)=>{
         // console.log(json);
+        setSearchData(json)
         setLength(json.length);
        
     })
@@ -152,6 +164,7 @@ export default function StickyHeadTable() {
  
 
   return <>
+   {data.length==0? <LinearProgress/>:null}
     <div>
         <h1>Transactions Dashboard</h1>
     </div>
@@ -176,7 +189,7 @@ export default function StickyHeadTable() {
           />
         )}
       /> */}
-        <Autocomplete   id="free-solo-2-demo" sx={{width:100}}  disableClearable options={data} renderInput={params => ( <TextField {...params} label="Serach Transactions" variant="outlined" /> )} getOptionLabel={option => option.title} style={{ width: 270 }} value={selectedTeam}  onChange={(_event, newTeam) => { setSelectedTeam(newTeam); }}  />
+        <Autocomplete   id="free-solo-2-demo" sx={{width:100}}  disableClearable options={serachData} renderInput={params => ( <TextField {...params} label="Serach Transactions" variant="outlined" /> )} getOptionLabel={option => option.title} style={{ width: 270 }} value={selectedTeam}  onChange={(_event, newTeam) => { setSelectedTeam(newTeam); }}  />
       </div>
       <div>
         <FormControl sx={{width:200,marginLeft:70}} >

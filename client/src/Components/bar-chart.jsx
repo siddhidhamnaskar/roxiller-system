@@ -3,7 +3,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { MonthContext } from './context';
 import { API } from '../services/API';
 const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-let pData = [24, 13, 98, 39, 48, 38, 43,89,23,82];
+let pData = [];
 const xLabels = [
   '0 - 100',
   '101 - 200',
